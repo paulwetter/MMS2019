@@ -1,5 +1,5 @@
 write-host "Creating Collections for BitLocker deployments (MMS 2019!)..."
-$CollectionFolder = 'Bitlocker-MMS2019'
+$CollectionFolder = 'BitLocker-MMS2019'
 
 #Load Configuration Manager PowerShell Module
 Import-Module (Join-Path $(Split-Path $env:SMS_ADMIN_UI_PATH) ConfigurationManager.psd1)
