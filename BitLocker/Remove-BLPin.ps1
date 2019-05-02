@@ -141,7 +141,7 @@ if ((Get-PWBLStatus) -eq "Protected"){
             Write-Log -Message 'TPM only key protector successfully added to volume.' -LogFile $BitLockerLog
             "Compliant"
         }else{
-            Write-Log -ErrorMessage "TPM only key protector not added to volume. Error [$ReturnValue]" -LogFile $BitLockerLog
+            Write-Log -ErrorMessage "TPM only key protector not added to volume. Error [$ReturnValue]" -Type 3 -LogFile $BitLockerLog
         }
     }
 }else{
