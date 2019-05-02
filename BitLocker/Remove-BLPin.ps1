@@ -1,4 +1,7 @@
-﻿Function Get-PWBLInfo{
+﻿#Log location for actions in this script.
+$BitLockerLog = "C:\Windows\Logs\Software\BitlockerActions.log"
+
+Function Get-PWBLInfo{
     [CmdletBinding()] 
     param (
         [Parameter(ValueFromPipelineByPropertyName=$false,Mandatory=$false,ValueFromPipeline=$false,
@@ -112,10 +115,6 @@ function Write-Log {
 	$LogMessage = "<![LOG[$Message $ErrorMessage" + "]LOG]!><time=`"$Time`" date=`"$Date`" component=`"$Component`" context=`"`" type=`"$Type`" thread=`"`" file=`"`">"
 	$LogMessage | Out-File -Append -Encoding UTF8 -FilePath $LogFile
 }
-
-
-
-$BitLockerLog = "C:\Windows\Logs\Software\BitlockerActions.log"
 
 
 Write-Log -Message 'Starting Bitlocker key protector review...' -LogFile $BitLockerLog
