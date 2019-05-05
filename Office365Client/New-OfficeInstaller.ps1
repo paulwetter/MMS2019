@@ -416,10 +416,10 @@ Function New-SCCMInstaller {
 		    [string]$SourcePath,
 		    [Parameter(Mandatory=$false)]
 		    [ValidateNotNullorEmpty()]
-            [int]$RunTime = 5,
+            [int]$RunTime = 15,
 		    [Parameter(Mandatory=$false)]
 		    [ValidateNotNullorEmpty()]
-            [int]$MaxRunTime = 15
+            [int]$MaxRunTime = 60
         )
 
     # create a script-based installer.
