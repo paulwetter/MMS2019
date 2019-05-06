@@ -56,7 +56,7 @@ Function Get-O365Urls {
     $DeferredSourceURL = ($o365BranchPaths.UpdateFiles.baseURL|where {$_.branch -eq "Deferred"}).url
     $CurrentSourceURL = ($o365BranchPaths.UpdateFiles.baseURL|where {$_.branch -eq "Current"}).url
     $FRDCSourceURL = ($o365BranchPaths.UpdateFiles.baseURL|where {$_.branch -eq "FirstReleaseDeferred"}).url
-    Write-Verbose "Deferred Channel: $DeferredSource`nCurrent Channel: $CurrentSource`nFirst Release Deferred: $FRDCSource"
+    Write-Verbose "Deferred Channel: $DeferredSourceURL`nCurrent Channel: $CurrentSourceURL`nFirst Release Deferred: $FRDCSourceURL"
     Remove-Item $XMLFile -Force -ErrorAction SilentlyContinue
     Remove-Item $workingO365CabPath -Force -ErrorAction SilentlyContinue
     $SourceUrls = New-Object -TypeName PSObject -Prop @{DeferredSourceURL = "$DeferredSourceURL"; CurrentSourceURL = "$CurrentSourceURL"; FRDCSourceURL = "$FRDCSourceURL"}
