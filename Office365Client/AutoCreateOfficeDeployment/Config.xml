@@ -1,0 +1,17 @@
+<Configuration>
+    <Add OfficeClientEdition="Bitness" OfficeMgmtCOM="TRUE" Channel="NameChannel" SourcePath="DownloadPath">
+        <Product ID="O365ProPlusRetail">
+            <Language ID="en-us" />
+			<ExcludeApp ID="Groove" />
+        </Product>
+        <Product ID="VisioStdXVolume">
+            <Language ID="en-us" />
+        </Product>
+        <Product ID="ProjectStdXVolume">
+            <Language ID="en-us" />
+        </Product>
+    </Add>
+    <Display Level="None" AcceptEULA="TRUE" />
+    <Property Name="SharedComputerLicensing" Value="0" />
+    <Updates Enabled="FALSE" Channel="NameChannel" />
+</Configuration>

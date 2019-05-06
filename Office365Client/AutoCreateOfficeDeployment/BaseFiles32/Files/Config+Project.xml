@@ -1,0 +1,16 @@
+<Configuration>
+    <Add OfficeClientEdition="32" Channel="Broad" OfficeMgmtCOM="TRUE">
+        <Product ID="O365ProPlusRetail">
+            <Language ID="en-us" />
+  			<ExcludeApp ID="Groove" />
+       </Product>
+        <Product ID="ProjectStdXVolume">
+            <Language ID="en-us" />
+        </Product>
+    </Add>
+    <Display Level="None" AcceptEULA="TRUE" />
+    <Logging Level="Standard" Path="C:\Windows\Logs\Software" />
+    <Property Name="SharedComputerLicensing" Value="0" />
+    <Updates Enabled="FALSE" Channel="Broad" />
+	<RemoveMSI All="True" />
+</Configuration>
