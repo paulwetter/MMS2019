@@ -33,8 +33,8 @@ $MyDate = get-date -Format MM/dd/yyyy
 $DLDir32 = "$StagingDir\O365ProPlus32\$DLDate"
 $DLDir64 = "$StagingDir\O365ProPlus64\$DLDate"
 
-if (!(Test-Path $DLDir32)) {New-Item -Path $DLDir32 -ItemType directory}
-if (!(Test-Path $DLDir64)) {New-Item -Path $DLDir64 -ItemType directory}
+if (!(Test-Path $DLDir32)) { New-Item -Path $DLDir32 -ItemType directory }
+if (!(Test-Path $DLDir64)) { New-Item -Path $DLDir64 -ItemType directory }
 
 
 Function Get-O365Urls {
@@ -53,13 +53,13 @@ Function Get-O365Urls {
     expand.exe "$workingO365CabPath" "$TempDir" -f:$o36532bitXML >$null
     $XMLFile = "$TempDir\$o36532bitXML"
     [xml]$o365BranchPaths = Get-Content $XMLFile
-    $DeferredSourceURL = ($o365BranchPaths.UpdateFiles.baseURL|where {$_.branch -eq "Deferred"}).url
-    $CurrentSourceURL = ($o365BranchPaths.UpdateFiles.baseURL|where {$_.branch -eq "Current"}).url
-    $FRDCSourceURL = ($o365BranchPaths.UpdateFiles.baseURL|where {$_.branch -eq "FirstReleaseDeferred"}).url
+    $DeferredSourceURL = ($o365BranchPaths.UpdateFiles.baseURL | where { $_.branch -eq "Deferred" }).url
+    $CurrentSourceURL = ($o365BranchPaths.UpdateFiles.baseURL | where { $_.branch -eq "Current" }).url
+    $FRDCSourceURL = ($o365BranchPaths.UpdateFiles.baseURL | where { $_.branch -eq "FirstReleaseDeferred" }).url
     Write-Verbose "Deferred Channel: $DeferredSourceURL`nCurrent Channel: $CurrentSourceURL`nFirst Release Deferred: $FRDCSourceURL"
     Remove-Item $XMLFile -Force -ErrorAction SilentlyContinue
     Remove-Item $workingO365CabPath -Force -ErrorAction SilentlyContinue
-    $SourceUrls = New-Object -TypeName PSObject -Prop @{DeferredSourceURL = "$DeferredSourceURL"; CurrentSourceURL = "$CurrentSourceURL"; FRDCSourceURL = "$FRDCSourceURL"}
+    $SourceUrls = New-Object -TypeName PSObject -Prop @{DeferredSourceURL = "$DeferredSourceURL"; CurrentSourceURL = "$CurrentSourceURL"; FRDCSourceURL = "$FRDCSourceURL" }
     Return $SourceUrls
 }
 
@@ -67,9 +67,9 @@ Function Get-O365Urls {
 Function Get-O365Build {
     [CmdletBinding()]
     param(
-	    [Parameter(Mandatory=$true)]
-	    [ValidateNotNullorEmpty()]
-	    [string]$SourceURL
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        [string]$SourceURL
     )
     $TempDir = $env:TEMP
     $v32Cab = "v32.cab"
@@ -90,23 +90,23 @@ Function Get-O365Build {
 
 
 Function Test-OfficeBranch {
-    	[CmdletBinding()]
+    [CmdletBinding()]
     Param (
-            [Parameter(Mandatory=$true)]
-		    [ValidateNotNullorEmpty()]
-            [string]$SrcDir,
-            [Parameter(Mandatory=$true)]
-            [ValidateSet("DC","FRDC","CC")]
-            [string]$Branch,
-            [Parameter(Mandatory=$false)]
-            [ValidateSet("32","64")]
-            [string]$Bitness = 32
-        )
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        [string]$SrcDir,
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("DC", "FRDC", "CC")]
+        [string]$Branch,
+        [Parameter(Mandatory = $false)]
+        [ValidateSet("32", "64")]
+        [string]$Bitness = 32
+    )
 
-    switch ($Branch){
-        FRDC{$channel = "FRDCSourceURL"; break}
-        CC  {$channel = "CurrentSourceURL"; break}
-        DC  {$channel = "DeferredSourceURL"; break}
+    switch ($Branch) {
+        FRDC { $channel = "FRDCSourceURL"; break }
+        CC { $channel = "CurrentSourceURL"; break }
+        DC { $channel = "DeferredSourceURL"; break }
     }
 
     $OfficeBuild = Get-O365Build -SourceURL (Get-O365Urls).$channel
@@ -124,35 +124,35 @@ Function Test-OfficeBranch {
 }
 
 
-Function Download-OfficeProPlusChannel{
+Function Download-OfficeProPlusChannel {
 
-    	[CmdletBinding()]
+    [CmdletBinding()]
     Param (
-		    [Parameter(Mandatory=$true)]
-		    [ValidateNotNullorEmpty()]
-		    [string]$TargetDirectory,
-		    [Parameter(Mandatory=$true)]
-		    [ValidateNotNullorEmpty()]
-		    [string]$SourceConfigXML,
-		    [Parameter(Mandatory=$true)]
-		    [ValidateNotNullorEmpty()]
-		    [string]$SetupEXEPath,
-            [Parameter(Mandatory=$true)]
-		    [ValidateNotNullorEmpty()]
-            [ValidateSet(32,64)]
-            [string]$Bitness,
-            [Parameter(Mandatory=$true)]
-            [ValidateSet("DC","FRDC","CC")]
-            [string]$Branch,
-            [Parameter(Mandatory=$true)]
-		    [ValidateNotNullorEmpty()]
-            [string]$SrcDir
-        )
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        [string]$TargetDirectory,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        [string]$SourceConfigXML,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        [string]$SetupEXEPath,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        [ValidateSet(32, 64)]
+        [string]$Bitness,
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("DC", "FRDC", "CC")]
+        [string]$Branch,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        [string]$SrcDir
+    )
 
-    switch ($Branch){
-        FRDC{$channel = "FirstReleaseDeferred"; break}
-        CC  {$channel = "Current"; break}
-        DC  {$channel = "Deferred"; break}
+    switch ($Branch) {
+        FRDC { $channel = "FirstReleaseDeferred"; break }
+        CC { $channel = "Current"; break }
+        DC { $channel = "Deferred"; break }
     }
     
     $TempConfig = "$env:TEMP\Config.xml"
@@ -160,49 +160,50 @@ Function Download-OfficeProPlusChannel{
 
     $FilesExist = Test-OfficeBranch -SrcDir $SrcDir -Branch $Branch -Bitness $Bitness
 
-    if ($FilesExist -eq $false){
+    if ($FilesExist -eq $false) {
         Copy-Item $SourceConfigXML $TempConfig -Force
-        $content = [System.IO.File]::ReadAllText("$TempConfig").Replace("NameChannel","$channel")
+        $content = [System.IO.File]::ReadAllText("$TempConfig").Replace("NameChannel", "$channel")
         [System.IO.File]::WriteAllText("$TempConfig", $content)
-        $content = [System.IO.File]::ReadAllText("$TempConfig").Replace("Bitness","$Bitness")
+        $content = [System.IO.File]::ReadAllText("$TempConfig").Replace("Bitness", "$Bitness")
         [System.IO.File]::WriteAllText("$TempConfig", $content)
-        $content = [System.IO.File]::ReadAllText("$TempConfig").Replace("DownloadPath","$DownloadPath")
+        $content = [System.IO.File]::ReadAllText("$TempConfig").Replace("DownloadPath", "$DownloadPath")
         [System.IO.File]::WriteAllText("$TempConfig", $content)
 
         Start-Process -FilePath $SetupEXEPath -ArgumentList "/download $TempConfig" -NoNewWindow -Wait
-    } else {
+    }
+    else {
         Write-Verbose "Files already exist for the current build of Office 365 ProPlus.  Skipping download of, $Bitness-bit, $channel"
     }
 }
 
 
-Function New-OfficeInstallSourceFiles{
+Function New-OfficeInstallSourceFiles {
 
-    	[CmdletBinding()]
+    [CmdletBinding()]
     Param (
-		    [Parameter(Mandatory=$true)]
-		    [ValidateNotNullorEmpty()]
-		    [string]$DownloadDir,
-            [Parameter(Mandatory=$true)]
-		    [ValidateNotNullorEmpty()]
-            [string]$CfgMgrSrcDir,
-            [Parameter(Mandatory=$true)]
-            [ValidateSet("DC","FRDC","CC")]
-            [string]$Branch,
-            [Parameter(Mandatory=$true)]
-		    [string]$BaseFiles,
-            [Parameter(Mandatory=$false)]
-		    [string]$MyDate = (get-date -Format MM/dd/yyyy),
-            [Parameter(Mandatory=$false)]
-            [ValidateSet("32","64")]
-            [string]$Bitness = 32
-        )
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        [string]$DownloadDir,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        [string]$CfgMgrSrcDir,
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("DC", "FRDC", "CC")]
+        [string]$Branch,
+        [Parameter(Mandatory = $true)]
+        [string]$BaseFiles,
+        [Parameter(Mandatory = $false)]
+        [string]$MyDate = (get-date -Format MM/dd/yyyy),
+        [Parameter(Mandatory = $false)]
+        [ValidateSet("32", "64")]
+        [string]$Bitness = 32
+    )
 
 
-    switch ($Branch){
-        FRDC{$OfficeBuild = Get-O365Build -SourceURL (Get-O365Urls).FRDCSourceURL; $channel = "FirstReleaseDeferred"; break}
-        CC  {$OfficeBuild = Get-O365Build -SourceURL (Get-O365Urls).CurrentSourceURL; $channel = "Current"; break}
-        DC  {$OfficeBuild = Get-O365Build -SourceURL (Get-O365Urls).DeferredSourceURL; $channel = "Deferred"; break}
+    switch ($Branch) {
+        FRDC { $OfficeBuild = Get-O365Build -SourceURL (Get-O365Urls).FRDCSourceURL; $channel = "FirstReleaseDeferred"; break }
+        CC { $OfficeBuild = Get-O365Build -SourceURL (Get-O365Urls).CurrentSourceURL; $channel = "Current"; break }
+        DC { $OfficeBuild = Get-O365Build -SourceURL (Get-O365Urls).DeferredSourceURL; $channel = "Deferred"; break }
     }
 
     $StageDir = "$DownloadDir\$Branch"
@@ -229,54 +230,56 @@ Function New-OfficeInstallSourceFiles{
 
 
         Write-Verbose "Rewriting versions and dates inside of source file: $BranchSrcDir\Deploy-Application.ps1"
-        $content = [System.IO.File]::ReadAllText("$BranchSrcDir\Deploy-Application.ps1").Replace("16.0.6965.2066","$OfficeBuild")
+        $content = [System.IO.File]::ReadAllText("$BranchSrcDir\Deploy-Application.ps1").Replace("16.0.6965.2066", "$OfficeBuild")
         [System.IO.File]::WriteAllText("$BranchSrcDir\Deploy-Application.ps1", $content)
-        $content = [System.IO.File]::ReadAllText("$BranchSrcDir\Deploy-Application.ps1").Replace("07/19/2017","$MyDate")
+        $content = [System.IO.File]::ReadAllText("$BranchSrcDir\Deploy-Application.ps1").Replace("07/19/2017", "$MyDate")
         [System.IO.File]::WriteAllText("$BranchSrcDir\Deploy-Application.ps1", $content)
 
         foreach ($confxml in (Get-Item "$BranchSrcDir\Files\*.xml").fullname) {
             Write-Verbose "Rewriting versions and dates inside of source file: $confxml"
-            $content = [System.IO.File]::ReadAllText("$confxml").Replace("Deferred","$channel")
+            $content = [System.IO.File]::ReadAllText("$confxml").Replace("Deferred", "$channel")
             [System.IO.File]::WriteAllText("$confxml", $content)
         }
     }
     Else {
-    Write-Verbose "Office Branch/Channel already compiled: $Branch,$channel,$OfficeBuild"
+        Write-Verbose "Office Branch/Channel already compiled: $Branch,$channel,$OfficeBuild"
     }
 }
 
 
-Function Set-Stage{
+Function Set-Stage {
 
-    	[CmdletBinding()]
+    [CmdletBinding()]
     Param (
-		    [Parameter(Mandatory=$true)]
-		    [ValidateNotNullorEmpty()]
-		    [string]$Stage,
-            [Parameter(Mandatory=$true)]
-		    [ValidateNotNullorEmpty()]
-            [string]$StagingDir
-        )
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        [string]$Stage,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        [string]$StagingDir
+    )
     If ($Stage -ieq "Reset") {
-        If (Test-Path -Path "$StagingDir\Stage.log") {Remove-Item -Path "$StagingDir\Stage.log"}
-    } else {
+        If (Test-Path -Path "$StagingDir\Stage.log") { Remove-Item -Path "$StagingDir\Stage.log" }
+    }
+    else {
         Write-Verbose "Completing stage [$Stage].."
         Add-Content -Value "Stage: $Stage" -Path "$StagingDir\Stage.log"
     }
 }
 
 
-Function Get-Stage{
+Function Get-Stage {
 
-    	[CmdletBinding()]
+    [CmdletBinding()]
     Param (
-            [Parameter(Mandatory=$true)]
-		    [ValidateNotNullorEmpty()]
-            [string]$StagingDir
-        )
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        [string]$StagingDir
+    )
     If (Test-Path -Path "$StagingDir\Stage.log") {
         ((Get-Content -Tail 1 -Path "$StagingDir\Stage.log") -split ": ")[1]
-    } else {
+    }
+    else {
         return 0
     }
 }
@@ -286,60 +289,60 @@ Function Import-SCCMAppLibraries {
     [CmdletBinding()]
     param()
     Write-Verbose "Adding Microsoft.ConfigurationManagement.ApplicationManagement.dll..."
-    if ($env:SMS_ADMIN_UI_PATH) {Write-Verbose "Console Install found at: ${env:SMS_ADMIN_UI_PATH} -- Continuing library load..."}
+    if ($env:SMS_ADMIN_UI_PATH) { Write-Verbose "Console Install found at: ${env:SMS_ADMIN_UI_PATH} -- Continuing library load..." }
     else {
         write-error "Console install not found. Environmental variable SMS_ADMIN_UI_PATH not found. Unable to load required libraries."
         return "Failure"
     }
-    Try{
-    Add-Type -Path (Join-Path (Split-Path $env:SMS_ADMIN_UI_PATH) Microsoft.ConfigurationManagement.ApplicationManagement.dll)
-    Add-Type -Path (Join-Path (Split-Path $env:SMS_ADMIN_UI_PATH) Microsoft.ConfigurationManagement.ApplicationManagement.MsiInstaller.dll)
-    Add-Type -Path (Join-Path (Split-Path $env:SMS_ADMIN_UI_PATH) Microsoft.ConfigurationManagement.ManagementProvider.dll)
-    Add-Type -Path (Join-Path (Split-Path $env:SMS_ADMIN_UI_PATH) Microsoft.ConfigurationManagement.ApplicationManagement.Extender.dll)
-    Add-Type -Path (Join-Path (Split-Path $env:SMS_ADMIN_UI_PATH) DcmObjectModel.dll)
-    Add-Type -Path (Join-Path (Split-Path $env:SMS_ADMIN_UI_PATH) AdminUI.WqlQueryEngine.dll)
-    Add-Type -Path (Join-Path (Split-Path $env:SMS_ADMIN_UI_PATH) AdminUI.AppManFoundation.dll)
+    Try {
+        Add-Type -Path (Join-Path (Split-Path $env:SMS_ADMIN_UI_PATH) Microsoft.ConfigurationManagement.ApplicationManagement.dll)
+        Add-Type -Path (Join-Path (Split-Path $env:SMS_ADMIN_UI_PATH) Microsoft.ConfigurationManagement.ApplicationManagement.MsiInstaller.dll)
+        Add-Type -Path (Join-Path (Split-Path $env:SMS_ADMIN_UI_PATH) Microsoft.ConfigurationManagement.ManagementProvider.dll)
+        Add-Type -Path (Join-Path (Split-Path $env:SMS_ADMIN_UI_PATH) Microsoft.ConfigurationManagement.ApplicationManagement.Extender.dll)
+        Add-Type -Path (Join-Path (Split-Path $env:SMS_ADMIN_UI_PATH) DcmObjectModel.dll)
+        Add-Type -Path (Join-Path (Split-Path $env:SMS_ADMIN_UI_PATH) AdminUI.WqlQueryEngine.dll)
+        Add-Type -Path (Join-Path (Split-Path $env:SMS_ADMIN_UI_PATH) AdminUI.AppManFoundation.dll)
     }
-    Catch{
+    Catch {
         write-error "Failed to add all of the required libraries.  $($_.Exception.ErrorID) --- $($_.Exception.Message)"
     }
 }
 
 
 function New-SCCMSession {
-	[CmdletBinding()]
+    [CmdletBinding()]
     Param (
-        [Parameter(Mandatory=$false,ParameterSetName="local")]
-        [Parameter(Mandatory=$true,ParameterSetName="withcred")]
-		[ValidateNotNullorEmpty()]
-		[string]$Server = "localhost",
-        [Parameter(Mandatory=$false,ParameterSetName="withcred")]
-		[ValidateNotNullorEmpty()]
-		[string]$User,
-        [Parameter(Mandatory=$true,ParameterSetName="withcred")]
-		[ValidateNotNullorEmpty()]
-		[string]$Password,
-		[Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false, ParameterSetName = "local")]
+        [Parameter(Mandatory = $true, ParameterSetName = "withcred")]
+        [ValidateNotNullorEmpty()]
+        [string]$Server = "localhost",
+        [Parameter(Mandatory = $false, ParameterSetName = "withcred")]
+        [ValidateNotNullorEmpty()]
+        [string]$User,
+        [Parameter(Mandatory = $true, ParameterSetName = "withcred")]
+        [ValidateNotNullorEmpty()]
+        [string]$Password,
+        [Parameter(Mandatory = $false)]
         $factory = (New-Object Microsoft.ConfigurationManagement.AdminConsole.AppManFoundation.ApplicationFactory)
-	)
+    )
     $Session = New-Object Microsoft.ConfigurationManagement.ManagementProvider.WqlQueryEngine.WqlConnectionManager
-        if ($Session  -ne $null) {
-            Write-Verbose "connection object Created"}
-        else {
-            Write-Verbose "Connection object Creation failed"}
+    if ($Session -ne $null) {
+        Write-Verbose "connection object Created"
+    }
+    else {
+        Write-Verbose "Connection object Creation failed"
+    }
  
     # Connect with credentials if not running on the server itself
-    if (($env:computername -ieq $Server) -or ($Server -ieq "localhost")){
+    if (($env:computername -ieq $Server) -or ($Server -ieq "localhost")) {
         Write-Verbose  "Local WQL Connection Made:"
         [void]$Session.Connect($Server)
     }
-    elseif ($User)
-    {
+    elseif ($User) {
         Write-Verbose "Remote WQL Connection Made: " + $Server
         [void]$Session.Connect($Server, $User, $Password)
     }
-    else
-    {
+    else {
         Write-Verbose "Remote WQL Connection Made using current credentials: " + $Server
         [void]$Session.Connect($Server)
     }
@@ -349,25 +352,25 @@ function New-SCCMSession {
 
 
 Function New-SCCMAppBase {
-	[CmdletBinding()]
+    [CmdletBinding()]
     Param (
-		[Parameter(Mandatory=$true)]
-		[ValidateNotNullorEmpty()]
-		[string]$Title,
-		[Parameter(Mandatory=$true)]
-		[ValidateNotNullorEmpty()]
-		[string]$Publisher,
-		[Parameter(Mandatory=$true)]
-		[ValidateNotNullorEmpty()]
-		[string]$AppVersion,
-		[Parameter(Mandatory=$true)]
-		[ValidateNotNullorEmpty()]
-		[string]$LocalTitle = $Title,
-		[Parameter(Mandatory=$false)]
-		[ValidateNotNullorEmpty()]
-		[string]$Language = "en-US",
-		[Parameter(Mandatory=$false)]
-		[ValidateScript({ Test-Path -LiteralPath $_ -PathType 'leaf' })]
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        [string]$Title,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        [string]$Publisher,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        [string]$AppVersion,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        [string]$LocalTitle = $Title,
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullorEmpty()]
+        [string]$Language = "en-US",
+        [Parameter(Mandatory = $false)]
+        [ValidateScript( { Test-Path -LiteralPath $_ -PathType 'leaf' })]
         [string]$Icon
 
     )
@@ -387,12 +390,11 @@ Function New-SCCMAppBase {
     # set the localised application name.
     $info.Title = "$LocalTitle"
     $info.Language = $Language
-    if ($Icon)
-        {
-            $SCCMIcon = New-Object Microsoft.ConfigurationManagement.ApplicationManagement.Icon
-            $SCCMIcon.data = [System.IO.File]::ReadAllBytes("$Icon")
-            $info.Icon = $SCCMIcon
-        }
+    if ($Icon) {
+        $SCCMIcon = New-Object Microsoft.ConfigurationManagement.ApplicationManagement.Icon
+        $SCCMIcon.data = [System.IO.File]::ReadAllBytes("$Icon")
+        $info.Icon = $SCCMIcon
+    }
 
     # save the display properties.
     $app.DisplayInfo.Add($info)
@@ -403,24 +405,24 @@ Function New-SCCMAppBase {
 
 
 Function New-SCCMInstaller {
-	[CmdletBinding()]
+    [CmdletBinding()]
     Param (
-		    [Parameter(Mandatory=$true)]
-		    [ValidateNotNullorEmpty()]
-		    [string]$InstallCmd,
-		    [Parameter(Mandatory=$true)]
-		    [ValidateNotNullorEmpty()]
-		    [string]$UninstallCmd,
-		    [Parameter(Mandatory=$true)]
-		    #[ValidateScript({ Test-Path -LiteralPath $_ -PathType 'Container' })]
-		    [string]$SourcePath,
-		    [Parameter(Mandatory=$false)]
-		    [ValidateNotNullorEmpty()]
-            [int]$RunTime = 15,
-		    [Parameter(Mandatory=$false)]
-		    [ValidateNotNullorEmpty()]
-            [int]$MaxRunTime = 60
-        )
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        [string]$InstallCmd,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        [string]$UninstallCmd,
+        [Parameter(Mandatory = $true)]
+        #[ValidateScript({ Test-Path -LiteralPath $_ -PathType 'Container' })]
+        [string]$SourcePath,
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullorEmpty()]
+        [int]$RunTime = 15,
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullorEmpty()]
+        [int]$MaxRunTime = 60
+    )
 
     # create a script-based installer.
     $installer = New-Object Microsoft.ConfigurationManagement.ApplicationManagement.ScriptInstaller
@@ -433,14 +435,14 @@ Function New-SCCMInstaller {
     $content = [Microsoft.ConfigurationManagement.ApplicationManagement.ContentImporter]::CreateContentFromFolder($SourcePath)
     $installer.Contents.Add($content)
 
-    $reference  =  New-Object Microsoft.ConfigurationManagement.ApplicationManagement.ContentRef
-    $reference.Id  = $content.Id
-    $installer.InstallContent =  $reference
+    $reference = New-Object Microsoft.ConfigurationManagement.ApplicationManagement.ContentRef
+    $reference.Id = $content.Id
+    $installer.InstallContent = $reference
 	
-	$installer.RequiresLogOn = $null
-	$installer.ExecutionContext = 'System'
-	$installer.MachineInstall = $true
-	$installer.RequiresUserInteraction = $true
+    $installer.RequiresLogOn = $null
+    $installer.ExecutionContext = 'System'
+    $installer.MachineInstall = $true
+    $installer.RequiresUserInteraction = $true
 
     Return $installer
 }
@@ -455,72 +457,72 @@ Function New-SCCMAppDetector {
 
 
 Function New-SCCMRegistryDetectionMethod {
-	[CmdletBinding()]
+    [CmdletBinding()]
     Param (
-		    [Parameter(Mandatory=$true)]
-            [ValidateSet("LocalMachine","ClassesRoot","CurrentConfig","CurrentUser","Users")]
-            [string]$RootKey,
-		    [Parameter(Mandatory=$true)]
-		    [ValidateNotNullorEmpty()]
-		    [string]$RegKey,
-            [Parameter(Mandatory=$true)]
-		    [ValidateNotNullorEmpty()]
-            [string]$RegValue,
-            [Parameter(Mandatory=$true)]
-		    [ValidateNotNullorEmpty()]
-            [string]$RegData,
-            [Parameter(Mandatory=$true)]
-            [ValidateSet("String","Int64","Version")]
-            [string]$RegType = "String",
-            [Parameter(Mandatory=$true)]
-            [ValidateSet("And","Or","IsEquals","NotEquals","GreaterThan","Between","GreaterEquals","LessEquals","BeginsWith","NotBeginsWith","EndsWith","NotEndsWith","Contains","NotContains","AllOf","OneOf","NoneOf","SetEquals","SupportedOperators")]
-            [string]$Operator,
-            [Parameter(Mandatory=$false)]
-		    [bool]$Is64Bit = $false,
-		    [Parameter(Mandatory=$true)]
-		    [ValidateNotNullorEmpty()]
-		    $App, #[Microsoft.ConfigurationManagement.ApplicationManagement.Application]$App,
-		    [Parameter(Mandatory=$true)]
-		    [ValidateNotNullorEmpty()]
-		    $Installer, #[Microsoft.ConfigurationManagement.ApplicationManagement.ScriptInstaller]$installer
-		    [Parameter(Mandatory=$true)]
-		    [ValidateNotNullorEmpty()]
-		    $detector #[Microsoft.ConfigurationManagement.ApplicationManagement.EnhancedDetectionMethod]$detector
-        )
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("LocalMachine", "ClassesRoot", "CurrentConfig", "CurrentUser", "Users")]
+        [string]$RootKey,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        [string]$RegKey,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        [string]$RegValue,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        [string]$RegData,
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("String", "Int64", "Version")]
+        [string]$RegType = "String",
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("And", "Or", "IsEquals", "NotEquals", "GreaterThan", "Between", "GreaterEquals", "LessEquals", "BeginsWith", "NotBeginsWith", "EndsWith", "NotEndsWith", "Contains", "NotContains", "AllOf", "OneOf", "NoneOf", "SetEquals", "SupportedOperators")]
+        [string]$Operator,
+        [Parameter(Mandatory = $false)]
+        [bool]$Is64Bit = $false,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        $App, #[Microsoft.ConfigurationManagement.ApplicationManagement.Application]$App,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        $Installer, #[Microsoft.ConfigurationManagement.ApplicationManagement.ScriptInstaller]$installer
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        $detector #[Microsoft.ConfigurationManagement.ApplicationManagement.EnhancedDetectionMethod]$detector
+    )
 
     #For some reason, registry detection methods return in an array with a couple members.  Returning the [1] member gets the actual detection item.
     #So, I just nest the detector function inside this function and then return the proper array member.
     Function New-RegDetection {
         [CmdletBinding()]
         Param (
-		        [Parameter(Mandatory=$true)][ValidateSet("LocalMachine","ClassesRoot","CurrentConfig","CurrentUser","Users")][string]$RootKey,
-                [Parameter(Mandatory=$true)]
-		        [ValidateNotNullorEmpty()]
-		        [string]$RegKey,
-                [Parameter(Mandatory=$true)]
-		        [ValidateNotNullorEmpty()]
-                [string]$RegValue,
-                [Parameter(Mandatory=$true)]
-		        [ValidateNotNullorEmpty()]
-                [string]$RegData,
-                [Parameter(Mandatory=$true)]
-                [ValidateSet("String","Int64","Version")]
-                [string]$RegType = "String",
-                [Parameter(Mandatory=$true)]
-                [ValidateSet("And","Or","IsEquals","NotEquals","GreaterThan","Between","GreaterEquals","LessEquals","BeginsWith","NotBeginsWith","EndsWith","NotEndsWith","Contains","NotContains","AllOf","OneOf","NoneOf","SetEquals","SupportedOperators")]
-                [string]$Operator,
-                [Parameter(Mandatory=$false)]
-		        [bool]$Is64Bit = $false,
-		        [Parameter(Mandatory=$true)]
-		        [ValidateNotNullorEmpty()]
-		        $App, #[Microsoft.ConfigurationManagement.ApplicationManagement.Application]$App,
-		        [Parameter(Mandatory=$true)]
-		        [ValidateNotNullorEmpty()]
-		        $Installer, #[Microsoft.ConfigurationManagement.ApplicationManagement.ScriptInstaller]$installer
-		        [Parameter(Mandatory=$true)]
-		        [ValidateNotNullorEmpty()]
-		        $Detector #[Microsoft.ConfigurationManagement.ApplicationManagement.EnhancedDetectionMethod]$detector
-            )
+            [Parameter(Mandatory = $true)][ValidateSet("LocalMachine", "ClassesRoot", "CurrentConfig", "CurrentUser", "Users")][string]$RootKey,
+            [Parameter(Mandatory = $true)]
+            [ValidateNotNullorEmpty()]
+            [string]$RegKey,
+            [Parameter(Mandatory = $true)]
+            [ValidateNotNullorEmpty()]
+            [string]$RegValue,
+            [Parameter(Mandatory = $true)]
+            [ValidateNotNullorEmpty()]
+            [string]$RegData,
+            [Parameter(Mandatory = $true)]
+            [ValidateSet("String", "Int64", "Version")]
+            [string]$RegType = "String",
+            [Parameter(Mandatory = $true)]
+            [ValidateSet("And", "Or", "IsEquals", "NotEquals", "GreaterThan", "Between", "GreaterEquals", "LessEquals", "BeginsWith", "NotBeginsWith", "EndsWith", "NotEndsWith", "Contains", "NotContains", "AllOf", "OneOf", "NoneOf", "SetEquals", "SupportedOperators")]
+            [string]$Operator,
+            [Parameter(Mandatory = $false)]
+            [bool]$Is64Bit = $false,
+            [Parameter(Mandatory = $true)]
+            [ValidateNotNullorEmpty()]
+            $App, #[Microsoft.ConfigurationManagement.ApplicationManagement.Application]$App,
+            [Parameter(Mandatory = $true)]
+            [ValidateNotNullorEmpty()]
+            $Installer, #[Microsoft.ConfigurationManagement.ApplicationManagement.ScriptInstaller]$installer
+            [Parameter(Mandatory = $true)]
+            [ValidateNotNullorEmpty()]
+            $Detector #[Microsoft.ConfigurationManagement.ApplicationManagement.EnhancedDetectionMethod]$detector
+        )
 
         # use an enhanced detection method (registry).
         $Installer.DetectionMethod = [Microsoft.ConfigurationManagement.ApplicationManagement.DetectionMethod]::Enhanced
@@ -543,7 +545,7 @@ Function New-SCCMRegistryDetectionMethod {
     
 
         # create the version comparison value.
-        $value = New-Object Microsoft.SystemsManagementServer.DesiredConfigurationManagement.Expressions.ConstantValue($RegData,$oRegSetting.SettingDataType)
+        $value = New-Object Microsoft.SystemsManagementServer.DesiredConfigurationManagement.Expressions.ConstantValue($RegData, $oRegSetting.SettingDataType)
     
         # configure the comparison operands.
         $operands = New-Object Microsoft.ConfigurationManagement.DesiredConfigurationManagement.CustomCollection``1[[Microsoft.SystemsManagementServer.DesiredConfigurationManagement.Expressions.ExpressionBase]]
@@ -563,20 +565,20 @@ Function New-SCCMRegistryDetectionMethod {
 
 
 Function Set-SCCMDetector {
-	[CmdletBinding()]
+    [CmdletBinding()]
     Param (
-            [Parameter(Mandatory=$true,ParameterSetName="expr1")]
-            [Parameter(Mandatory=$true,ParameterSetName="expr2")]
-		    $expression,
-            [Parameter(Mandatory=$true,ParameterSetName="expr1")]
-            [Parameter(Mandatory=$true,ParameterSetName="expr2")]
-		    $detector,
-		    [Parameter(Mandatory=$false,ParameterSetName="expr2")]
-		    $expression2,
-            [Parameter(Mandatory=$true,ParameterSetName="expr2")]
-            [ValidateSet("And","Or","IsEquals","NotEquals","GreaterThan","Between","GreaterEquals","LessEquals","BeginsWith","NotBeginsWith","EndsWith","NotEndsWith","Contains","NotContains","AllOf","OneOf","NoneOf","SetEquals","SupportedOperators")]
-            [string]$Operator
-        )
+        [Parameter(Mandatory = $true, ParameterSetName = "expr1")]
+        [Parameter(Mandatory = $true, ParameterSetName = "expr2")]
+        $expression,
+        [Parameter(Mandatory = $true, ParameterSetName = "expr1")]
+        [Parameter(Mandatory = $true, ParameterSetName = "expr2")]
+        $detector,
+        [Parameter(Mandatory = $false, ParameterSetName = "expr2")]
+        $expression2,
+        [Parameter(Mandatory = $true, ParameterSetName = "expr2")]
+        [ValidateSet("And", "Or", "IsEquals", "NotEquals", "GreaterThan", "Between", "GreaterEquals", "LessEquals", "BeginsWith", "NotBeginsWith", "EndsWith", "NotEndsWith", "Contains", "NotContains", "AllOf", "OneOf", "NoneOf", "SetEquals", "SupportedOperators")]
+        [string]$Operator
+    )
 
     If ($expression2) {
         $operands = New-Object Microsoft.ConfigurationManagement.DesiredConfigurationManagement.CustomCollection``1[[Microsoft.SystemsManagementServer.DesiredConfigurationManagement.Expressions.ExpressionBase]]
@@ -600,36 +602,36 @@ Function Set-SCCMDetector {
 
 
 Function Add-SCCMApplication {
-	[CmdletBinding()]
+    [CmdletBinding()]
     Param (
-		    [Parameter(Mandatory=$false)]
-		    $Factory = (New-Object Microsoft.ConfigurationManagement.AdminConsole.AppManFoundation.ApplicationFactory),
-		    [Parameter(Mandatory=$true)]
-		    $Application, #[Microsoft.ConfigurationManagement.ApplicationManagement.Application]$App,
-		    [Parameter(Mandatory=$true)]
-		    $Installer, #[Microsoft.ConfigurationManagement.ApplicationManagement.ScriptInstaller]$installer
-		    [Parameter(Mandatory=$true)]
-            $Detector,
-            [Parameter(Mandatory=$true)]
-            $Wrapper
-        )
+        [Parameter(Mandatory = $false)]
+        $Factory = (New-Object Microsoft.ConfigurationManagement.AdminConsole.AppManFoundation.ApplicationFactory),
+        [Parameter(Mandatory = $true)]
+        $Application, #[Microsoft.ConfigurationManagement.ApplicationManagement.Application]$App,
+        [Parameter(Mandatory = $true)]
+        $Installer, #[Microsoft.ConfigurationManagement.ApplicationManagement.ScriptInstaller]$installer
+        [Parameter(Mandatory = $true)]
+        $Detector,
+        [Parameter(Mandatory = $true)]
+        $Wrapper
+    )
 
-# associate the detector with the installer.
-$Installer.EnhancedDetectionMethod = $Detector
+    # associate the detector with the installer.
+    $Installer.EnhancedDetectionMethod = $Detector
 
-# create the deployment type.
-$Deployment = New-Object Microsoft.ConfigurationManagement.ApplicationManagement.DeploymentType($Installer, [Microsoft.ConfigurationManagement.ApplicationManagement.ScriptInstaller]::TechnologyId, [Microsoft.ConfigurationManagement.ApplicationManagement.NativeHostingTechnology]::TechnologyId)
+    # create the deployment type.
+    $Deployment = New-Object Microsoft.ConfigurationManagement.ApplicationManagement.DeploymentType($Installer, [Microsoft.ConfigurationManagement.ApplicationManagement.ScriptInstaller]::TechnologyId, [Microsoft.ConfigurationManagement.ApplicationManagement.NativeHostingTechnology]::TechnologyId)
 
-# name the deployment type after the application.
-$Deployment.Title = $Application.Title
+    # name the deployment type after the application.
+    $Deployment.Title = $Application.Title
 
-# associate the deployment type with the application.
-$Application.DeploymentTypes.Add($Deployment)
+    # associate the deployment type with the application.
+    $Application.DeploymentTypes.Add($Deployment)
 
-# save the application.
-$Wrapper.InnerAppManObject = $Application
-$factory.PrepareResultObject($Wrapper)
-$Wrapper.InnerResultObject.Put()
+    # save the application.
+    $Wrapper.InnerAppManObject = $Application
+    $factory.PrepareResultObject($Wrapper)
+    $Wrapper.InnerResultObject.Put()
 
 }
 
@@ -667,50 +669,50 @@ Function New-CMAppRegDetectionMethod {
 function Write-Log {
     [CmdletBinding()] 
     Param (
-		[Parameter(Mandatory=$false)]
-		$Message,
+        [Parameter(Mandatory = $false)]
+        $Message,
  
-		[Parameter(Mandatory=$false)]
-		$ErrorMessage,
+        [Parameter(Mandatory = $false)]
+        $ErrorMessage,
  
-		[Parameter(Mandatory=$false)]
-		$Component,
+        [Parameter(Mandatory = $false)]
+        $Component,
  
-		[Parameter(Mandatory=$false,HelpMessage="1 = Normal, 2 = Warning (yellow), 3 = Error (red)")]
-		[ValidateSet(1,2,3)]
+        [Parameter(Mandatory = $false, HelpMessage = "1 = Normal, 2 = Warning (yellow), 3 = Error (red)")]
+        [ValidateSet(1, 2, 3)]
         [int]$Type,
 		
-		[Parameter(Mandatory=$false,HelpMessage="Size in KB")]
-		[int]$LogSizeKB=512,
+        [Parameter(Mandatory = $false, HelpMessage = "Size in KB")]
+        [int]$LogSizeKB = 512,
 
-		[Parameter(Mandatory=$true)]
-		$LogFile
-	)
+        [Parameter(Mandatory = $true)]
+        $LogFile
+    )
     <#
     Type: 1 = Normal, 2 = Warning (yellow), 3 = Error (red)
     #>
-    $LogLength = $LogSizeKB*1024
-    try{
+    $LogLength = $LogSizeKB * 1024
+    try {
         $log = Get-Item $LogFile -ErrorAction Stop
-        If (($log.length) -gt $LogLength){
-	        $Time = Get-Date -Format "HH:mm:ss.ffffff"
-	        $Date = Get-Date -Format "MM-dd-yyyy"
+        If (($log.length) -gt $LogLength) {
+            $Time = Get-Date -Format "HH:mm:ss.ffffff"
+            $Date = Get-Date -Format "MM-dd-yyyy"
             $LogMessage = "<![LOG[Closing log and generating new log file" + "]LOG]!><time=`"$Time`" date=`"$Date`" component=`"$Component`" context=`"`" type=`"1`" thread=`"`" file=`"`">"
             $LogMessage | Out-File -Append -Encoding UTF8 -FilePath $LogFile
             Move-Item -Path "$LogFile" -Destination "$($LogFile.TrimEnd('g'))_" -Force
         }
     }
-    catch{Write-Verbose "Nothing to move or move failed."}
+    catch { Write-Verbose "Nothing to move or move failed." }
 
-	$Time = Get-Date -Format "HH:mm:ss.ffffff"
-	$Date = Get-Date -Format "MM-dd-yyyy"
+    $Time = Get-Date -Format "HH:mm:ss.ffffff"
+    $Date = Get-Date -Format "MM-dd-yyyy"
  
-	if ($ErrorMessage -ne $null) {$Type = 3}
-	if ($Component -eq $null) {$Component = " "}
-	if ($Type -eq $null) {$Type = 1}
+    if ($ErrorMessage -ne $null) { $Type = 3 }
+    if ($Component -eq $null) { $Component = " " }
+    if ($Type -eq $null) { $Type = 1 }
  
-	$LogMessage = "<![LOG[$Message $ErrorMessage" + "]LOG]!><time=`"$Time`" date=`"$Date`" component=`"$Component`" context=`"`" type=`"$Type`" thread=`"`" file=`"`">"
-	$LogMessage | Out-File -Append -Encoding UTF8 -FilePath $LogFile
+    $LogMessage = "<![LOG[$Message $ErrorMessage" + "]LOG]!><time=`"$Time`" date=`"$Date`" component=`"$Component`" context=`"`" type=`"$Type`" thread=`"`" file=`"`">"
+    $LogMessage | Out-File -Append -Encoding UTF8 -FilePath $LogFile
 }
 
 
@@ -725,28 +727,28 @@ $DCBuild = Get-O365Build -SourceURL $SourceUrls.DeferredSourceURL
 
 
 [int]$Stage = Get-Stage -StagingDir $StagingDir
-Write-verbose ("Beginning script at stage ["+([int]$Stage+1)+"]...")
+Write-verbose ("Beginning script at stage [" + ([int]$Stage + 1) + "]...")
 
 if ($Stage -lt 1) {
-Write-verbose "Downloading 32bit Deferred Channel"
-Download-OfficeProPlusChannel -TargetDirectory $DLDir32 -SourceConfigXML "$StagingDir\Config.xml" -SetupEXEPath "$StagingDir\setup.exe" -Bitness 32 -Branch DC -SrcDir $AppSourceFiles
-Set-Stage -Stage 1 -StagingDir $StagingDir
+    Write-verbose "Downloading 32bit Deferred Channel"
+    Download-OfficeProPlusChannel -TargetDirectory $DLDir32 -SourceConfigXML "$StagingDir\Config.xml" -SetupEXEPath "$StagingDir\setup.exe" -Bitness 32 -Branch DC -SrcDir $AppSourceFiles
+    Set-Stage -Stage 1 -StagingDir $StagingDir
 }
 
 if ($Stage -lt 2) {
-Write-verbose "Downloading 64bit Deferred Channel"
-Download-OfficeProPlusChannel -TargetDirectory $DLDir64 -SourceConfigXML "$StagingDir\Config.xml" -SetupEXEPath "$StagingDir\setup.exe" -Bitness 64 -Branch DC -SrcDir $AppSourceFiles
-Set-Stage -Stage 2 -StagingDir $StagingDir
+    Write-verbose "Downloading 64bit Deferred Channel"
+    Download-OfficeProPlusChannel -TargetDirectory $DLDir64 -SourceConfigXML "$StagingDir\Config.xml" -SetupEXEPath "$StagingDir\setup.exe" -Bitness 64 -Branch DC -SrcDir $AppSourceFiles
+    Set-Stage -Stage 2 -StagingDir $StagingDir
 }
 
 if ($Stage -lt 3) {
-New-OfficeInstallSourceFiles -DownloadDir $DLDir32 -CfgMgrSrcDir $AppSourceFiles -Branch DC -BaseFiles "$StagingDir\BaseFiles32"
-Set-Stage -Stage 3 -StagingDir $StagingDir
+    New-OfficeInstallSourceFiles -DownloadDir $DLDir32 -CfgMgrSrcDir $AppSourceFiles -Branch DC -BaseFiles "$StagingDir\BaseFiles32"
+    Set-Stage -Stage 3 -StagingDir $StagingDir
 }
 
 if ($Stage -lt 4) {
-New-OfficeInstallSourceFiles -DownloadDir $DLDir64 -CfgMgrSrcDir $AppSourceFiles -Branch DC -BaseFiles "$StagingDir\BaseFiles64" -Bitness 64
-Set-Stage -Stage 4 -StagingDir $StagingDir
+    New-OfficeInstallSourceFiles -DownloadDir $DLDir64 -CfgMgrSrcDir $AppSourceFiles -Branch DC -BaseFiles "$StagingDir\BaseFiles64" -Bitness 64
+    Set-Stage -Stage 4 -StagingDir $StagingDir
 }
 
 
@@ -777,13 +779,13 @@ Try {
 }
 Catch {
     Set-location $StartDir
-	#Write-Log -Message "Failed to load module and change to the Site Code provider.  $($_.Exception.ErrorID) --- $($_.Exception.Message)" -
+    #Write-Log -Message "Failed to load module and change to the Site Code provider.  $($_.Exception.ErrorID) --- $($_.Exception.Message)" -
     Write-Error "Failed to load module and change to the Site Code provider.  $($_.Exception.ErrorID) --- $($_.Exception.Message)"
     return "Failure"
 }
 if (Get-CMApplication -Name "$AppName $ApplicationVersion") {
     Set-location $StartDir
-	Return "Application `"$AppName $ApplicationVersion`" already exists."
+    Return "Application `"$AppName $ApplicationVersion`" already exists."
 }
 
 Write-Verbose "App does not already exist.  Building $AppName Version: $ApplicationVersion"
@@ -799,7 +801,7 @@ try {
 }
 Catch {
     Set-location $StartDir
-	Write-Error "Failed to build Factory, Session, or Wrapper.  $($_.Exception.ErrorID) --- $($_.Exception.Message)"
+    Write-Error "Failed to build Factory, Session, or Wrapper.  $($_.Exception.ErrorID) --- $($_.Exception.Message)"
     return "Failure"
 }
 
@@ -810,16 +812,17 @@ $RegRule2 = New-CMAppRegDetectionMethod -RegDetectionRoot LocalMachine -RegDetec
 Write-verbose "Building App, Installer, or base Detector...."
 try {
     If (Test-Path $IconPath) {
-		$app = New-SCCMAppBase -Title "$AppName $ApplicationVersion" -Publisher "$Publisher" -AppVersion "$ApplicationVersion" -LocalTitle "$AppName" -Icon "$IconPath"
-    } else {
-		$app = New-SCCMAppBase -Title "$AppName $ApplicationVersion" -Publisher "$Publisher" -AppVersion "$ApplicationVersion" -LocalTitle "$AppName"
-	}
-	$installer1 = New-SCCMInstaller -InstallCmd "$InstallCmd" -UninstallCmd "$UninstallCmd" -SourcePath "$AppSourceFiles"
+        $app = New-SCCMAppBase -Title "$AppName $ApplicationVersion" -Publisher "$Publisher" -AppVersion "$ApplicationVersion" -LocalTitle "$AppName" -Icon "$IconPath"
+    }
+    else {
+        $app = New-SCCMAppBase -Title "$AppName $ApplicationVersion" -Publisher "$Publisher" -AppVersion "$ApplicationVersion" -LocalTitle "$AppName"
+    }
+    $installer1 = New-SCCMInstaller -InstallCmd "$InstallCmd" -UninstallCmd "$UninstallCmd" -SourcePath "$AppSourceFiles"
     $MyDetector1 = New-SCCMAppDetector
 }
 Catch {
     Set-location $StartDir
-	Write-Error "Failed to build App, Installer, or base Detector.  $($_.Exception.ErrorID) --- $($_.Exception.Message)"
+    Write-Error "Failed to build App, Installer, or base Detector.  $($_.Exception.ErrorID) --- $($_.Exception.Message)"
     return "Failure"
 }
 
@@ -831,18 +834,18 @@ try {
 }
 Catch {
     Set-location $StartDir
-	Write-Error "Failed to build app detection expressions.  $($_.Exception.ErrorID) --- $($_.Exception.Message)"
+    Write-Error "Failed to build app detection expressions.  $($_.Exception.ErrorID) --- $($_.Exception.Message)"
     return "Failure"
 }
 
 Write-verbose "Putting it all together and creating application with name [$($app.Title)]"
-try{
+try {
     Add-SCCMApplication -Factory $factory -Application $app -Installer $installer1 -Detector $MyDetector1 -Wrapper $wrapper
-#    Add-SCCMApplication -Factory $factory -Application $app -Installer $installer2 -Detector $MyDetector2 -Wrapper $wrapper
+    #    Add-SCCMApplication -Factory $factory -Application $app -Installer $installer2 -Detector $MyDetector2 -Wrapper $wrapper
 }
 Catch {
     Set-location $StartDir
-	Write-Error "Failed to build Application.  $($_.Exception.ErrorID) --- $($_.Exception.Message)"
+    Write-Error "Failed to build Application.  $($_.Exception.ErrorID) --- $($_.Exception.Message)"
     return "Failure"
 }
 Write-Verbose "Application [$($app.Title)] has been successfully created in SCCM."
