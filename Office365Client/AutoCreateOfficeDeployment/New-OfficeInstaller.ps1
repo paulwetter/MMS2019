@@ -361,11 +361,11 @@ function New-SCCMSession {
         [void]$Session.Connect($Server)
     }
     elseif ($User) {
-        Write-Verbose "Remote WQL Connection Made: " + $Server
+        Write-Verbose "Remote WQL Connection Made: $($Server)"
         [void]$Session.Connect($Server, $User, $Password)
     }
     else {
-        Write-Verbose "Remote WQL Connection Made using current credentials: " + $Server
+        Write-Verbose "Remote WQL Connection Made using current credentials: $($Server)"
         [void]$Session.Connect($Server)
     }
 
