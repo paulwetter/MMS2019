@@ -1,7 +1,9 @@
 [CmdletBinding()]
 param()
 
+#The name of your SCCM Site server
 [string]$CMServer = 'localhost'
+#Your Site code
 [string]$CMSite = 'MMS'
 
 #The name of your application.  The version will be appended to the name in SCCM Console.  Software center will show without the name.
@@ -23,6 +25,26 @@ param()
 #This PS1 should be located in this directory along with your other staging files.
 $StagingDir = "G:\Staging\Office365"
 
+#Check for existence of setup.exe
+IF (!(Test-Path "$($StagingDir)\setup.exe")){
+	Write-Error "Setup.exe file not found at [$($StagingDir)\setup.exe]"
+	Return
+} Else {
+	Write-Verbose "Setup.exe file found at [$($StagingDir)\setup.exe]"
+}
+
+#verify running as admin.
+function Test-Administrator  
+{  
+    $user = [Security.Principal.WindowsIdentity]::GetCurrent();
+    (New-Object Security.Principal.WindowsPrincipal $user).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)  
+}
+IF (!(Test-Administrator)){
+	Write-Error "Not running as admininstrator."
+	Return
+} Else {
+	Write-Verbose "Running as admin... Continuing Script..."
+}
 
 
 
